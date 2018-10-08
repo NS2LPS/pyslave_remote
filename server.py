@@ -22,7 +22,7 @@ class reply:
     def start_kernel():
         global counter
         env = os.environ.copy()
-        env['SLAVE_ID'] = counter
+        env['SLAVE_ID'] = str(counter)
         proc = Popen('ipython kernel --profile=pyslave --ip={0}'.format(ip), stdout=PIPE, stderr=PIPE, env=env)
         out = ''
         timer = Timer(timeout_sec, proc.kill)
