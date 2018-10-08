@@ -24,7 +24,7 @@ with open('kernel.json','w') as f:
     f.write(ans['kernel_json'])
 
 # Connect to kernel
-proc = subprocess.run(["jupyter", "qtconsole", "--existing=kernel.json"])
+proc = subprocess.run(["/Users/je/anaconda3/bin/jupyter", "qtconsole", "--existing=kernel.json"])
 
 # Kill remote kernel
 socket.send('stop_kernel {0}'.format(id).encode())
