@@ -23,7 +23,7 @@ class reply:
         global counter
         env = os.environ.copy()
         env['SLAVE_ID'] = counter
-        proc = Popen('ipython kernel --profile=pyslave --ip={0}'.format(ip), stdout=PIPE, stderr=PIPE)
+        proc = Popen('ipython kernel --profile=pyslave --ip={0}'.format(ip), stdout=PIPE, stderr=PIPE, env=env)
         out = ''
         timer = Timer(timeout_sec, proc.kill)
         try:
@@ -81,5 +81,5 @@ while True:
     except:
         print("Server error")
         answer = json.dumps({'reply':'error'})
-        socket.send(answer.encode())    
+        socket.send(answer.encode())
         traceback.print_exc()
