@@ -20,6 +20,7 @@ timeout_sec = 10
 class reply:
     @staticmethod
     def start_kernel():
+        global counter
         env = os.environ.copy()
         env['SLAVE_ID'] = counter
         proc = Popen('ipython kernel --profile=pyslave --ip={0}'.format(ip), stdout=PIPE, stderr=PIPE)
@@ -29,20 +30,19 @@ class reply:
             print("Starting new kernel...")
             timer.start()
             while not proc.poll() and '.json' not in out:
-                out = proc.stdout.readline()
+                out = proc.stdout.readline().decode()
         finally:
-            print("Timeout")
             timer.cancel()
         if '.json' not in out:
             print('Error while starting kernel')
             print(p.stderr.read())
             print(out)
             return json.dumps({'reply':'error'})
-        print("Kernel OK")
+        print("Kernel {0} running".format(counter))
         fname = out.replace('--existing','').strip()
         fname = os.path.join(r'C:\Users\NS2-manip\AppData\Roaming\jupyter\runtime', fname)
         if not os.path.isfile(fname):
-            print('Kernel file {0} not found'.format(fname))
+            print('Kernel file {0} not found, killing kernel'.format(fname))
             proc.kill()
             return json.dumps({'reply':'error'})
         with open(fname,'r') as f:
@@ -53,7 +53,8 @@ class reply:
         return json.dumps({'reply':'ok','id':counter-1,'kernel_json':out})
     @staticmethod
     def stop_kernel(c):
-        print("Stopping kernel {c}...".format(c))
+        c = int(c)
+        print("Stopping kernel {0}...".format(c))
         if c not in proc_dict:
             print('Unknown kernel id : {0}'.format(c))
             return json.dumps({'reply':'error'})
@@ -78,4 +79,7 @@ while True:
         answer = getattr(reply, action)(*msg[1:])
         socket.send(answer.encode())
     except:
+        print("Server error")
+        answer = json.dumps({'reply':'error'})
+        socket.send(answer.encode())    
         traceback.print_exc()
