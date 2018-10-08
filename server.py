@@ -70,7 +70,7 @@ class reply:
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:%s" % port)
-
+print("Server is running...")
 while True:
     msg = socket.recv().decode()
     try:
